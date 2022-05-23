@@ -1,5 +1,5 @@
 {
-  "name": "td-grp-a",
+  "name": "vue3-router-classic-vite-tailwind-icon",
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
@@ -7,18 +7,20 @@
     "preview": "vite preview --port 5050"
   },
   "dependencies": {
+    "@headlessui/react": "^1.6.2",
+    "@headlessui/vue": "^1.6.2",
     "@heroicons/vue": "^1.0.6",
-    "vue": "^3.2.31",
+    "firebase": "^9.8.1",
+    "vue": "^3.2.33",
     "vue-router": "^4.0.14"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.3.1",
-    "autoprefixer": "^10.4.4",
-    "postcss": "^8.4.12",
+    "autoprefixer": "^10.4.7",
+    "postcss": "^8.4.13",
     "prettier": "^2.6.2",
-    "prettier-plugin-tailwindcss": "^0.1.8",
-    "tailwindcss": "^3.0.23",
-    "vite": "^2.9.1",
-    "vite-plugin-pages": "^0.22.0"
+    "prettier-plugin-tailwindcss": "^0.1.10",
+    "tailwindcss": "^3.0.24",
+    "vite": "^2.9.5"
   }
 }
