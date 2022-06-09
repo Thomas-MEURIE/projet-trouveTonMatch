@@ -1,11 +1,62 @@
 <template>
-            <form class="flex flex-col items-center mb-[96px]" @submit.prevent="updateMatch()">
+    <div class="fixed top-0 w-full rounded-b-2xl bg-blue-400">
+      <p class="py-[10px] pl-[20px] text-xl text-white">Mes matchs</p>
+    <nav class="w-full] grid grid-cols-2 justify-items-center items-center pb-[10px]">
+       <RouterLink to="/match/mesmatchs" class="no-underline p-[10px] my-[5px] bg-gray-300 rounded-xl flex flex-col content-center justify-items-center">
+        <p>Mes Match</p>
+      </RouterLink>
+      <RouterLink to="/match/attente" class="no-underline p-[10px] my-[5px] bg-gray-300 rounded-xl flex flex-col content-center justify-items-center">
+        <p>En attente</p>
+      </RouterLink>
+      <RouterLink to="/match/passes" class="no-underline p-[10px] my-[5px] bg-gray-300 rounded-xl flex flex-col content-center justify-items-center">
+        <p>Match passé</p>
+      </RouterLink>
+      <RouterLink to="/match/annules" class="no-underline p-[10px] my-[5px] bg-gray-300 rounded-xl flex flex-col content-center justify-items-center">
+        <p>Match Annulés</p>
+      </RouterLink>
+    </nav>
+    </div>
+            <form class="flex flex-col items-center mt-[180px] mb-[96px]">
 
-            <a href="#">Aller vers {{nomTerrain}}</a>
+            
+            <div class="flex flex-col items-center mb-[10px] px-[40px]">
+                    <a :href="urlTerrain" class="w-full rounded-full py-[10px] px-[15px] my-[20px] bg-blue-400 text-center text-white">
+                        <p>Aller vers {{nomTerrain}}</p>
+                    </a>
+                    <button class="w-full rounded-full py-[10px] px-[15px] bg-red-400 text-white" v-if="modifiable" type="button" @click="annuler()">
+                        <p v-if="isCreator">Annuler le match</p>
+                        <p v-if="!isCreator">Quitter le match</p>
+                    </button>
+            </div>
 
-                <div class="h-[32px] mt-[20px] alert alert-warning text-center mb-3" v-if="message!=null" >
-                    {{ message }}
+            <p class="self-start pl-[10px] py-[10px]">Dans le match :</p>
+
+            <div class="w-[80%] bg-gray-300 h-[50px] my-[5px] px-[20px]" v-for="part in listeParticipants" :key='part.userName'>
+                <div class="h-full flex flex-row items-center">
+                    <img class="rounded-full h-[80%] w-auto" :src="getImage(part.avatar)">
+                    <p>{{part.userName}}</p>
                 </div>
+            </div>
+
+            <p class="self-start pl-[10px] py-[10px]">En attente :</p>
+            <p class="self-start px-[20px] py-[10px]" v-if="listeAttente.length == 0">Il n'y a personne en attente</p>
+
+            <div class="flex flex-row flex-wrap justify-between w-[80%] bg-gray-300 h-[50px] my-[5px] px-[20px]" v-for="(part, index) in listeAttente" :key='part.userName'>
+                <div class="h-full flex flex-row items-center">
+                    <img class="rounded-full h-[80%] w-auto" :src="getImage(part.avatar)">
+                    <p>{{part.userName}}</p>
+                </div>
+                <div class="h-full flex flex-row items-center">
+                    <button class="rounded-full p-[5px] bg-green-400 text-white mr-[10px]" v-if="isCreator && modifiable" type="button" @click="accept(index)">
+                        <p>Accepter</p>
+                    </button>
+                    <button class="rounded-full p-[5px] bg-red-400 text-white" v-if="isCreator && modifiable" type="button" @click="decline(index)">
+                        <p>Refuser</p>
+                    </button>
+                </div>
+            </div>
+
+
             </form>
             <hr class='mb-5' style='clear:both'/>
 </template>
@@ -26,7 +77,8 @@ import {
     onSnapshot,     // Demander une liste de documents d'une collection, en les synchronisant
     query,          // Permet d'effectuer des requêtes sur Firestore
     orderBy,
-    where       // Permet de demander le tri d'une requête query
+    where,
+    Timestamp       // Permet de demander le tri d'une requête query
     } from 'https://www.gstatic.com/firebasejs/9.7.0/firebase-firestore.js'
 
 import {
@@ -66,6 +118,10 @@ import {
                 nomTerrain: '',
                 urlTerrain: '#',
                 message:null,
+                refmatch:null,
+                refterrain:null,
+                isCreator:false,
+                modifiable:true,
             }
         },
 
@@ -73,89 +129,142 @@ import {
           let user = getAuth().currentUser;
           if(user){
                 this.user = user;
-                console.log('user: ' + this.user);
+                console.log('user: ' + this.user.uid);
+                this.getMatch();
               //this.message = "User déjà connecté : "+this.user.email;
           }else{
               this.message = "";
               this.$router.push("/");
           }
-          this.getMatch(this.$route.params.id);
         },
 
         methods:{
 
-            async getMatch(id){
+            async getMatch(){
                 const firestore = getFirestore();
-                const docRef =  (firestore, "matchs", id);
+                const docRef = doc(firestore, "matchs", this.$route.params.id);
                 this.refmatch = await getDoc(docRef);
                 if(this.refmatch.exists()){
                     this.match = this.refmatch.data();
-                    this.console.log("match : " + this.match);
-                    /*
-                    const docRefTerrain =  (firestore, "stades", this.match.localisation);
-                    this.refterrain = await getDoc(docRefTerrain);
+                    console.log("match : " + this.match);
+
+                    if (this.match.creator == this.user.uid)
+                    this.isCreator = true;
+                    console.log("créateur : " + this.isCreator);
+
+                    const satdeID = this.match.localisation;
+
+                    const date = new Date();
+
+                    if ((Timestamp.fromDate(date) > this.match.date) || this.match.annule)
+                        this.modifiable = false;
+                    
+                    const docRefTerrain = doc(firestore, "stades", satdeID);
+                    this.refTerrain = await getDoc(docRefTerrain);
                     if(this.refTerrain.exists()){
                         this.terrain = this.refTerrain.data();
                         this.nomTerrain = this.terrain.nom;
                         this.urlTerrain = this.terrain.map;
+                        console.log("stade : " + satdeID);
                     }
                     else{
-                        this.console.log("Terrain inexistant");
+                        console.log("Terrain inexistant");
                     }
 
-                    var partLenght = this.match.participants.lenght;
-                    for (let i = 0; i < partLenght; i++) {
+                    for (let i in this.match.participants) {
+                        console.log("Participant : " + this.match.participants[i]);
                         const dbUser = collection(firestore, "compte")
                         const q = query(dbUser, where("uid", "==", this.match.participants[i]));
                         await onSnapshot(q, (snapshot) => {
-                        this.userInfo = snapshot.docs.map(doc => (
-                            {id:doc.id, ...doc.data()}
-                        ));
-                        console.log("userInfo", this.userInfo)
-                        
-                        var userData = this.userInfo[0];
-
-                        const spaceRef = ref(getStorage(), 'user/'+ userData.avatar);
-                        getDownloadURL(spaceRef)
-                            .then((url) => {
-                            userData.avatar = url;
+                            this.userInfo = snapshot.docs.map(doc => (
+                                {id:doc.id, ...doc.data()}
+                            ))
+                            var listeParticipantsBase;
+                            this.userInfo.forEach(function(user){
+                                listeParticipantsBase = user;
                             })
-                            .catch((error) =>{
-                            console.log('erreur downloadURL', error)
-                            })
-                        })
-                        this.listeParticipants.push(userData);
+                            ;
+                            this.listeParticipants.push(listeParticipantsBase);
+                        });
                     }
 
-                    var waitingLenght = this.match.waiting.lenght;
-                    for (let i = 0; i < waitingLenght; i++) {
+                    for (let i in this.match.waiting) {
+                        console.log("Participant : " + this.match.waiting[i]);
                         const dbUser = collection(firestore, "compte")
-                        const q = query(dbUser, where("uid", "==", i));
+                        const q = query(dbUser, where("uid", "==", this.match.waiting[i]));
                         await onSnapshot(q, (snapshot) => {
-                        this.userInfo = snapshot.docs.map(doc => (
-                            {id:doc.id, ...doc.data()}
-                        ));
-                        console.log("userInfo", this.userInfo)
-                        
-                        var userData = this.userInfo[0];
-
-                        const spaceRef = ref(getStorage(), 'user/'+ userData.avatar);
-                        getDownloadURL(spaceRef)
-                            .then((url) => {
-                            userData.avatar = url;
+                            this.userInfo = snapshot.docs.map(doc => (
+                                {id:doc.id, ...doc.data()}
+                            ))
+                            var listeParticipantsBase;
+                            this.userInfo.forEach(function(user){
+                                listeParticipantsBase = user;
                             })
-                            .catch((error) =>{
-                            console.log('erreur downloadURL', error)
-                            })
-                        })
-                        this.listeParticipants.push(userData);
-                    }*/
-                }else{
-                    this.console.log("Match inexistant");
+                            ;
+                            this.listeAttente.push(listeParticipantsBase);
+                        });
+                    }
                 }
             },
 
-            async updatePro(){         
+            getImage(image){
+                var result = '';
+                const storage = getStorage();
+                // Récupération de l'image par son nom de fichier
+                const spaceRef = ref(storage, 'user/'+ image);
+                // Récupération de l'url complète de l'image
+                getDownloadURL(spaceRef)
+                .then((url) => {
+                    // On remplace le nom du fichier
+                    // Par l'url complète de la photo
+                    console.log("URL image : " + url);
+                    result = url;
+                    return result;
+                })
+                .catch((error) =>{
+                    console.log('erreur downloadUrl', error);
+                })
+            },
+
+            async annuler(){
+                    const firestore = getFirestore();
+                if(this.isCreator){
+                    this.match.annule = true;
+                }
+                else{
+                    const listLenght = this.match.participants.length;
+                    console.log('nouvelle liste : ', listLenght);
+                    for (let i = 0; i < listLenght; i++) {
+                        if (this.match.participants[i] == this.user.uid) {
+                            this.match.participants.splice(i, 1);
+                            console.log('nouvelle liste : ', this.match.participants);
+                        }
+                    }
+                }
+                await updateDoc(doc(firestore, "matchs", this.$route.params.id), this.match);
+                this.$router.push('/match/mesmatchs');
+            },
+
+            async decline(part){
+                this.match.waiting.splice(part, 1);
+                console.log('Num dans liste retiré : ', part);
+                const firestore = getFirestore();
+                // Modification du participant à partir de son id
+                await updateDoc(doc(firestore, "matchs", this.$route.params.id), this.match);
+                this.listeParticipants = [];
+                this.listeAttente = [];
+                this.getMatch();
+            },
+
+            async accept(part){
+                this.match.participants.push(this.match.waiting[part])
+                this.match.waiting.splice(part, 1);
+                const firestore = getFirestore();
+                // Modification du participant à partir de son id
+                await updateDoc(doc(firestore, "matchs", this.$route.params.id), this.match);
+                this.listeParticipants = [];
+                this.listeAttente = [];
+                this.getMatch();
             }
         }
     }

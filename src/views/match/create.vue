@@ -119,7 +119,7 @@ export default {
         async getTerrain(id){
             this.match.localisation = this.$route.params.id;
             const firestore = getFirestore();
-            const docRef =  (firestore, "stades", id);
+            const docRef = doc(firestore, "stades", id);
             this.refterrain = await getDoc(docRef);
             if(this.refTerrain.exists()){
                 this.terrain = this.refTerrain.data();

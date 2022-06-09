@@ -68,7 +68,7 @@ export default {
       
         const firestore = getFirestore();
         
-        const dbTerrain= collection(firestore, "stades");
+        const dbTerrain = collection(firestore, "stades");
         
         const query = await getDocs(dbTerrain);
         query.forEach((doc) => {

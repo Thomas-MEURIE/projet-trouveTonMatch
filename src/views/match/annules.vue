@@ -2,7 +2,7 @@
     <div class="fixed top-0 w-full rounded-b-2xl bg-blue-400">
       <p class="py-[10px] pl-[20px] text-xl text-white">Mes matchs</p>
     <nav class="w-full] grid grid-cols-2 justify-items-center items-center pb-[10px]">
-       <RouterLink to="/match/mesmatchs" class="no-underline p-[10px] my-[5px] bg-green-400 text-white rounded-xl flex flex-col content-center justify-items-center">
+       <RouterLink to="/match/mesmatchs" class="no-underline p-[10px] my-[5px] bg-gray-300 rounded-xl flex flex-col content-center justify-items-center">
         <p>Mes Match</p>
       </RouterLink>
       <RouterLink to="/match/attente" class="no-underline p-[10px] my-[5px] bg-gray-300 rounded-xl flex flex-col content-center justify-items-center">
@@ -11,7 +11,7 @@
       <RouterLink to="/match/passes" class="no-underline p-[10px] my-[5px] bg-gray-300 rounded-xl flex flex-col content-center justify-items-center">
         <p>Match passé</p>
       </RouterLink>
-      <RouterLink to="/match/annules" class="no-underline p-[10px] my-[5px] bg-gray-300 rounded-xl flex flex-col content-center justify-items-center">
+      <RouterLink to="/match/annules" class="no-underline p-[10px] my-[5px] bg-green-400 text-white rounded-xl flex flex-col content-center justify-items-center">
         <p>Match Annulés</p>
       </RouterLink>
     </nav>
@@ -19,7 +19,7 @@
         <div class="flex flex-col items-center mt-[180px]">
           
           <tbody>
-            <p v-if="listeMatchs.length == 0" class="mt-[80px]">Vous n'êtes dans aucun match</p>
+            <p v-if="listeMatchs.length == 0" class="mt-[80px]">Vous n'avez aucun match annulé</p>
 
           <tr v-for='matchs in listeMatchs' :key='matchs.id'>
 
@@ -61,8 +61,7 @@
                       <p class="text-white">Tchat</p>
                   </div>
                   <RouterLink class="flex flex-row flex-wrap btn btn-light mx-5 h-14 bg-blue-400 rounded-full justify-center items-center" :to="{ name:'InfoMatch', params: { id: matchs.id }}">
-                      <p class="text-white" v-if="user.uid == matchs.creator">Gérer le match</p>
-                      <p class="text-white" v-if="user.uid != matchs.creator">Voir le match</p>
+                      <p class="text-white">Voir le match</p>
                   </RouterLink>
                 </div>
               </div>
@@ -126,11 +125,10 @@ export default {
             // Base de données (collection)  document participant
             const dbMatchs = collection(firestore, "matchs");
             // Liste des participants triés sur leur nom
-            const q = query(dbMatchs, where("annule", "==", false));
+            const q = query(dbMatchs, where("annule", "==", true));
             // Liste des participants triés sur leur nom
             const m = query(q, where("participants", "array-contains", this.user.uid));
-            const d = query(m, where("date", ">", dateStamp));
-            await onSnapshot(d, (snapshot) => {
+            await onSnapshot(m, (snapshot) => {
                 this.listeMatchs = snapshot.docs.map(doc => (
                     {id:doc.id, ...doc.data()}
                 ))
