@@ -1,6 +1,6 @@
 <template>
             <div class="flex flex-col items-center">
-                <img src="../../../public/logo.png" alt="" class="my-[50px] w-auto h-auto">
+                <img src="../../assets/logo.png" alt="" class="my-[50px] w-auto h-auto">
             </div>
             <form class="flex flex-col items-center mb-[96px]" @submit.prevent="createAc()">
 
@@ -87,6 +87,7 @@ import {
                     uid:null,
                     ville:null,
                     notif:true,
+                    isAdmin:false,
                 },
                 imgModifiee:false,
                 message:null,

@@ -1,6 +1,6 @@
 <template>
         <div class="flex flex-col items-center">
-          <img class="my-[45px]" src="../../public/SmallLogo.png" alt="">
+          <img class="my-[45px]" src="../assets/SmallLogo.png" alt="">
           <div class="w-11/12 border-2 bg-slate-100 flex flex-row p-2.5 rounded-full">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M8.25 14.25C11.5637 14.25 14.25 11.5637 14.25 8.25C14.25 4.93629 11.5637 2.25 8.25 2.25C4.93629 2.25 2.25 4.93629 2.25 8.25C2.25 11.5637 4.93629 14.25 8.25 14.25Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -8,8 +8,8 @@
           </svg>
           <input class="form-control bg-transparent ml-2.5" type="text" v-model="query" placeholder="Trouve un terrain" required />
           </div>
-          <div v-for='stades in listeTerrainsSynchro' :key='stades.id'>
-              <div class="rounded-3xl flex flex-wrap border-2 mx-2 my-5 overflow-hidden border-gray-500">
+          <div v-for='stades in listeTerrains' :key='stades.id'>
+              <div class="rounded-3xl flex max-w-[500px] flex-wrap border-2 mx-2 my-5 overflow-hidden border-gray-500">
                   <img class="object-cover w-full h-[145px]" :src="stades.image" :alt="stades.nom">
                   <div class="p-1.5 grid grid-cols-2 my-3 w-full content-center align-between">
                   <p>{{stades.nom}}</p>
@@ -35,6 +35,11 @@ import {
     updateDoc, 
     deleteDoc, 
     onSnapshot } from 'https://www.gstatic.com/firebasejs/9.7.0/firebase-firestore.js'
+
+import { 
+    getStorage, 
+    ref, 
+    getDownloadURL } from 'https://www.gstatic.com/firebasejs/9.7.0/firebase-storage.js'
 
 export default {  
   name:'ListeView',
@@ -75,6 +80,19 @@ export default {
                 ville: doc.data().ville
             }
             this.listeTerrains.push(stades);
+
+            this.listeTerrains.forEach(async function(satde){
+
+                    const storage = getStorage();
+                    const spaceRef = ref(storage, 'stades/'+ satde.image);
+                    getDownloadURL(spaceRef)
+                    .then((url) => {
+                        satde.image = url;
+                    })
+                    .catch((error) =>{
+                        console.log('erreur downloadUrl', error);
+                    })
+                })
         })
     },
 
@@ -88,6 +106,19 @@ export default {
         
           this.listeTerrainsSynchro = snapshot.docs.map(doc => ({id:doc.id, ...doc.data()}));
       })
+
+      this.listeTerrainsSynchro.forEach(async function(satde){
+
+                    const storage = getStorage();
+                    const spaceRef = ref(storage, 'stades/'+ satde.image);
+                    getDownloadURL(spaceRef)
+                    .then((url) => {
+                        satde.image = url;
+                    })
+                    .catch((error) =>{
+                        console.log('erreur downloadUrl', error);
+                    })
+                })
     },
 
     /*async createCategorie(){

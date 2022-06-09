@@ -6,6 +6,8 @@ import ProfileView from '../views/ProfileView.vue'
 import CreateAccount from '../views/account/Create.vue'
 import EditAccount from '../views/account/Edit.vue'
 import CreateMatch from '../views/match/create.vue'
+import MyMatchs from '../views/match/mesMatchs.vue'
+import MatchsPasses from '../views/match/passes.vue'
 //import EditMatch from '../views/match/edit.vue'
 
 const router = createRouter({
@@ -18,6 +20,8 @@ const router = createRouter({
     { path: '/account/create', name: 'Creer compte', component: CreateAccount },
     { path: '/account/edit', name: 'Modifier profil', component: EditAccount },
     { path: '/match/create/:id', name: 'CreateMatch', component: CreateMatch },
+    { path: '/match/mesmatchs/', name: 'MesMatchs', component: MyMatchs },
+    { path: '/match/passes/', name: 'Passes', component: MatchsPasses },
     //{ path: '/match/edit/:id', name: 'EditMatch', component: EditMatch },
     // ici les autre routes
   ]

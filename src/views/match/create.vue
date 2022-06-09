@@ -1,110 +1,71 @@
 <template>
-    <div class="container">
-        <form enctype="multipart/form-data" 
-            @submit.prevent="createMatch"
-        >
-            <div class="card bg-dark">
+            <form class="w-full h-screen flex flex-col items-center pt-[70px] bg-green-400 mb-[-20px] text-white" @submit.prevent="createMatch()">
+                <div class="md:w-[70%] h-full flex flex-col items-center text-white">
+                    <div class="mb-[70px]">
+                        <p>Créer un match</p>
+                        <p>{{nom}}</p>
+                    </div>
 
-                <div class="card-header">
-                    <h5 style="color:white;">Création participant</h5>
-                </div>    
+                    <div class="flex flex-row flex-wrap justify-between w-9/12">
+                        <label for="niveau">Sport</label>
+                        <select class="shrink text-black" name="sport" id="sport" v-model="match.sport">
+                            <option value="Football">Football</option>
+                            <option value="Basketball">Basketball</option>
+                            <option value="Volleyball">Volleyball</option>
+                            <option value="Pétanque">Pétanque</option>
+                        </select>
+                    </div>
+                    <div class="h-px w-9/12 bg-white my-[30px]"></div>
+                    <div class="flex flex-row flex-wrap justify-between w-9/12">
+                        <label for="niveau">Type</label>
+                        <select class="shrink text-black" name="type" id="type" v-model="match.type">
+                            <option value="3v3">3v3</option>
+                            <option value="4v4">4v4</option>
+                            <option value="5v5">5v5</option>
+                            <option value="6v6">6v6</option>
+                        </select>
+                    </div>
+                    <div class="h-px w-9/12 bg-white my-[30px]"></div>
+                    <div class="flex flex-row flex-wrap justify-between w-9/12">
+                        <label for="niveau">Niveau</label>
+                        <select class="shrink text-black" name="niveau" id="niveau" v-model="match.niveau">
+                            <option value="Débutant">Débutant</option>
+                            <option value="Intermédiare">Intermédiare</option>
+                            <option value="Expert">Expert</option>
+                        </select>
+                    </div>
+                    <div class="h-px w-9/12 bg-white my-[30px]"></div>
+                    <label class="justify-self-start" for="dateMatch">Date et heure</label>
+                    <input class="form-control w-9/12 text-black" id="dateMatch" type="datetime-local" v-model="match.date" placeholder="Date et Heure" required />
+                    
+                    <div class="w-[80%] mt-[30px]">
+                        <p>*Nous ne permettons en aucuns cas la réservation d’un terrain libre d’accès.</p>
+                    </div>
 
-                <div class="card-body">   
-                    <div class="row">
-                        <div class="col-6">
-                            <div>
-                                <img class="preview img-fluid" :src="imageData"/>
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" >Nom</span>
-                                </div>
-                                <input 
-                                    class="form-control" placeholder="Nom de la personne"
-                                    v-model="participant.nom"
-                                    required />                    
-                            </div>
-                            <br/>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" >Prénom</span>
-                                </div>
-                                <input 
-                                    v-model="participant.prenom"
-                                    class="form-control" placeholder="Prénom de la personne" key=
-                                    required />                    
-                            </div>
-                            <br/>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">Photo</span>
-                                </div>
-                                <div class="custom-file">
-                                    <input type="file" class="custom-file-input" ref="file" id="file" 
-                                    @change="previewImage"
-                                    >
-                                    <label class="custom-file-label" for="file">Sélectionner l'image</label>
-                                </div>
-                            </div>
-                            <br/>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" >Date naissance</span>
-                                </div>
-                                <input 
-                                    type="date"
-                                    class="form-control"
-                                    v-model="participant.naissance" 
-                                    format="dd/mm/yyyy" 
-                                    required />                    
-                            </div>
-                            <br/>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" >Pays</span>
-                                </div>
-                                <select class="custom-select" v-model="participant.nationalite">
-                                    <option selected disabled>Sélectionner un Pays</option>
-                                    <option v-for="pays in listePays" :key="pays.nom">
-                                        {{pays.nom}}
-                                    </option>
-                                </select>
-                            </div>
-                            <br/>
-                        </div>
-                    </div>               
-                </div>
-
-                <div class="card-footer">   
-                    <button type="submit" class="float-left btn btn-dark">
-                        Créer
-                    </button>
-                    <button class="float-right btn btn-dark" >
-                        <router-link to="/participants" >Cancel</router-link>
+                    <button class="h-[52px] w-11/12 bg-blue-400 mt-[40px] rounded-full text-white" type="submit">
+                        Enregistrer
                     </button>
                 </div>
-
-            </div>
-        </form>        
-    </div>
+            </form>
 </template>
 
 <script>
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updateProfile } from 'https://www.gstatic.com/firebasejs/9.7.0/firebase-auth.js'
+
 // Bibliothèque Firestore : import des fonctions
 import { 
     getFirestore,   // Obtenir le Firestore
     collection,     // Utiliser une collection de documents
     doc,            // Obtenir un document par son id
-    getDocs,        // Obtenir la liste des documents d'une collection
+    getDocs,       // Obtenir la liste des documents d'une collection
+    getDoc,       // Obtenir la liste des documents d'une collection
     addDoc,         // Ajouter un document à une collection
     updateDoc,      // Mettre à jour un document dans une collection
     deleteDoc,      // Supprimer un document d'une collection
     onSnapshot,     // Demander une liste de documents d'une collection, en les synchronisant
     query,          // Permet d'effectuer des requêtes sur Firestore
-    orderBy         // Permet de demander le tri d'une requête query
+    orderBy,
+    Timestamp      // Permet de demander le tri d'une requête query
     } from 'https://www.gstatic.com/firebasejs/9.7.0/firebase-firestore.js'
 
 
@@ -120,89 +81,86 @@ import {
 export default {
     name:'CreateView',
     data() {
-        return {
-            imageData:null,         // Image prévisualisée
-            match:{           // Le participant à créer
-                annule:false,               // son nom
-                image:null,            // son prénom
-                photo:null,             // sa photo (nom du fichier)
-                naissance:null,         // sa date de naissance
-                nationalite:null        // sa nationalité
+        return {                
+            user:{
+                email:null,
+                password:null,
+                uid:null
+            },
+            nom:null,
+            match:{
+                annule:false,
+                creator:null,
+                date:null,
+                localisation:null,
+                niveau:null,
+                participants:[],
+                placesMax:null,
+                sport:null,
+                type:null,
+                waiting:[]
             }
         }
     },
-    mounted(){ // Montage de la vue
-        // Appel de la liste des pays
-        this.getImage();
-        this.getTerrain(this.$route.params.id);
+    mounted(){
+          let user = getAuth().currentUser;
+          if(user){
+              this.user = user;
+              console.log('user: ' + this.user.email);
+              this.message = "User déjà connecté : "+this.user.email;
+          }else{
+              this.message = "";
+              this.$router.push("/");
+          }
+            this.getTerrain(this.$route.params.id);
     },
     methods : {
 
-        async getImage(id){
-            // Obtenir le Storage
-            const storage = getStorage();
-            // Référence de l'image du participant
-            const spaceRef = ref(storage, 'user/profileDefault.png');
-            // Récupération de l'url complète de l'image
-            getDownloadURL(spaceRef)
-                .then((url) => {
-                    // Mise à jour de l'image prévisualisée
-                    this.imageData = url;
-            })
-            .catch((error) =>{
-                console.log('erreur downloadUrl', error);
-            })
-        },
-
         async getTerrain(id){
-            // Obtenir Firestore
+            this.match.localisation = this.$route.params.id;
             const firestore = getFirestore();
-            // Base de données (collection)  document participant
-            // Récupération sur Firestore du participant via son id
             const docRef =  (firestore, "stades", id);
-            // Référence du participant concerné
             this.refterrain = await getDoc(docRef);
-            // Test si le participant demandé existe
             if(this.refTerrain.exists()){
-                // Si oui on récupère ses données
                 this.terrain = this.refTerrain.data();
-                // Mémorisation photoActuelle
-                this.photoActuelle = this.terrain.photo;
+                this.nom = this.terrain.nom;
             }else{
-                // Sinon simple message d'erreur
-                this.console.log("Participant inexistant");
+                this.console.log("Terrain inexistant");
             }
-            // Obtenir le Storage
-            const storage = getStorage();
-            // Référence de l'image du participant
-            const spaceRef = ref(storage, 'stades/'+this.terrain.photo);
-            // Récupération de l'url complète de l'image
-            getDownloadURL(spaceRef)
-                .then((url) => {
-                    // Mise à jour de l'image prévisualisée
-                    this.imageData = url;
-            })
-            .catch((error) =>{
-                console.log('erreur downloadUrl', error);
-            })
         },
 
         async createMatch(){
-            // Obtenir storage Firebase
-            const storage = getStorage();
-            // Référence de l'image à uploader
-            const refStorage = ref(storage, 'stade/'+this.match.photo);
-            // Upload de l'image sur le Cloud Storage
-            await uploadString(refStorage, this.imageData, 'data_url').then((snapshot) => {
-                console.log('Uploaded a base64 string');
-                
-                // Création du participant sur le Firestore
-                const db = getFirestore();
-                const docRef = addDoc(collection(db, 'matchs'), this.match );
-            });
-            // redirection sur la liste des participants
-            this.$router.push('/participants');            
-        }
+            if (this.match.type == '3v3')
+                    this.match.placesMax = 6;
+            if (this.match.type == '4v4')
+                    this.match.placesMax = 8;
+            if (this.match.type == '5v5')
+                    this.match.placesMax = 10;
+            if (this.match.type == '6v6 ')
+                    this.match.placesMax = 12;
+
+            var dayTime = new Date(this.match.date+':00.000');
+            var dateStamp = Timestamp.fromDate(dayTime);
+            this.match.date = dateStamp;
+            console.log('Date: '+ dateStamp.toDate().toLocaleDateString("fr-fr", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
+
+            const firestore = getFirestore();
+            const dbMatch= collection(firestore, "matchs");   
+            const docRef = await addDoc(dbMatch,{
+                annule: this.match.annule,
+                creator: this.user.uid,
+                date: this.match.date,
+                localisation: this.match.localisation,
+                niveau: this.match.niveau,
+                participants:[this.user.uid],
+                placesMax: this.match.placesMax,
+                sport: this.match.sport,
+                type: this.match.type,
+                waiting:[]
+            })
+            
+            this.$router.push('/join');
+        },
     }
 
 }

@@ -1,6 +1,6 @@
 <template>
             <form class="flex flex-col items-center mb-[96px]" @submit.prevent="onCnx()">
-                <img src="../../public/logo.png" alt="" class="my-[100px] w-auto h-auto">
+                <img src="../assets/logo.png" alt="" class="my-[100px] w-auto h-auto">
                 <input class="form-control w-9/12" id="email" type="text" v-model="user.email" placeholder="E-mail" required />
                 <div class="h-px w-9/12 bg-black my-[10px]"></div>
                 <div class="flex flex-row justify-between w-9/12">
