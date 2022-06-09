@@ -1,6 +1,6 @@
 <template>
     <nav class="fixed top-0 w-full h-[96px] flex flex-row justify-evenly items-center rounded-b-2xl bg-gray-300">
-      <RouterLink to="match/mesmatchs" class="no-underline flex flex-col content-center justify-items-center">
+       <RouterLink to="match/mesmatchs" class="no-underline flex flex-col content-center justify-items-center">
         <p>Mes Match</p>
       </RouterLink>
       <RouterLink to="match/attente" class="no-underline flex flex-col content-center justify-items-center">
@@ -16,11 +16,14 @@
         <div class="flex flex-col items-center mt-[100px]">
           
           <tbody>
+            <p v-if="listeMatchs.length == 0" class="mt-[80px]">Vous n'êtes dans aucun match</p>
+
           <tr v-for='matchs in listeMatchs' :key='matchs.id'>
 
           <div class="rounded-[10px] flex flex-wrap flex-row border-2 border-gray-500 mx-2 my-5 overflow-hidden">
-              <p class="px-[10px] py-[4px] mt-[13px] ml-[13px] text-white bg-green-400 rounded-full border-2 border-gray-500">{{matchs.stade}}</p>
-              <div class="p-1.5 flex flex-col my-0.5 w-full items-center">
+              <p class="px-[10px] py-[4px] mt-[13px] ml-[13px] text-green-400 font-bold">{{matchs.stade}}</p>
+                <div class="h-px w-full bg-black my-[10px]"></div>
+                <div class="p-1.5 flex flex-col my-0.5 w-full items-center">
                 <div class="p-1.5 grid grid-cols-2 my-3 w-full content-center align-between text-center">
                   <div>
                     <p>{{dateFr(matchs.date)}}</p>
@@ -33,7 +36,7 @@
                 </div>
                 <div class="my-[-10px] text-center">
                   <p>Places</p>
-                  <div class="font-bold flex flex-row text-lg text-center align-bottom">
+                  <div class="font-bold flex flex-row flex-wrap text-lg text-center justify-center items-end align-bottom">
                     <p class="text-blue-400 text-xl">{{matchs.participants.length}}</p>
                     <p class="before:content-['/']">{{matchs.placesMax}}</p>
                   </div>
@@ -50,9 +53,15 @@
                     </div>
                   </div>
                 </div>
-                <button class="btn btn-light mx-5 w-4/5 h-14 bg-blue-400 rounded-full" type="button" title="Création"  @click="askMatch(matchs.id)">
-                    <p class="text-white">Demander à rejoindre</p>
-                </button>
+                <div class="w-full">
+                  <div class="flex flex-row flex-wrap btn btn-light mx-5 mb-[15px] h-14 bg-green-400 rounded-full justify-center items-center" v-if="true">
+                      <p class="text-white">Tchat</p>
+                  </div>
+                  <div class="flex flex-row flex-wrap btn btn-light mx-5 h-14 bg-blue-400 rounded-full justify-center items-center">
+                      <p class="text-white" v-if="user.uid == matchs.creator">Gérer le match</p>
+                      <p class="text-white" v-if="user.uid != matchs.creator">Voir le match</p>
+                  </div>
+                </div>
               </div>
           </div>
           </tr>
