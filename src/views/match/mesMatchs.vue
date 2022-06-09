@@ -57,10 +57,10 @@
                   <div class="flex flex-row flex-wrap btn btn-light mx-5 mb-[15px] h-14 bg-green-400 rounded-full justify-center items-center" v-if="true">
                       <p class="text-white">Tchat</p>
                   </div>
-                  <div class="flex flex-row flex-wrap btn btn-light mx-5 h-14 bg-blue-400 rounded-full justify-center items-center">
+                  <RouterLink class="flex flex-row flex-wrap btn btn-light mx-5 h-14 bg-blue-400 rounded-full justify-center items-center" :to="{ name:'InfoMatch', params: { id: matchs.id }}">
                       <p class="text-white" v-if="user.uid == matchs.creator">Gérer le match</p>
                       <p class="text-white" v-if="user.uid != matchs.creator">Voir le match</p>
-                  </div>
+                  </RouterLink>
                 </div>
               </div>
           </div>

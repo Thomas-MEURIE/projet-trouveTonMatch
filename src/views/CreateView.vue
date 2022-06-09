@@ -13,7 +13,7 @@
                   <img class="object-cover w-full h-[145px]" :src="stades.image" :alt="stades.nom">
                   <div class="p-1.5 grid grid-cols-2 my-3 w-full content-center align-between">
                   <p>{{stades.nom}}</p>
-                  <RouterLink class="btn btn-light justify-self-end mx-5 w-36 h-14 bg-green-400 rounded-full"  :to="{ name:'CreateMatch', params: { id: stades.id }}">
+                  <RouterLink class="btn btn-light justify-self-end mx-5 w-36 h-14 bg-green-400 rounded-full" :to="{ name:'CreateMatch', params: { id: stades.id }}">
                       <p class="text-white text-center mt-[16px]">Organiser</p>
                   </RouterLink>
                   </div>

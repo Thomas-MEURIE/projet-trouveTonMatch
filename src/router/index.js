@@ -7,7 +7,8 @@ import CreateAccount from '../views/account/Create.vue'
 import EditAccount from '../views/account/Edit.vue'
 import CreateMatch from '../views/match/create.vue'
 import MyMatchs from '../views/match/mesMatchs.vue'
-import MatchsPasses from '../views/match/passes.vue'
+//import MatchsPasses from '../views/match/passes.vue'
+import MatchsInfos from '../views/match/info.vue'
 //import EditMatch from '../views/match/edit.vue'
 
 const router = createRouter({
@@ -17,12 +18,12 @@ const router = createRouter({
     { path: '/create', name: 'Creer', component: CreateView },
     { path: '/join', name: 'Rejoindre', component: JoinView },
     { path: '/profile', name: 'Profil', component: ProfileView },
-    { path: '/account/create', name: 'Creer compte', component: CreateAccount },
-    { path: '/account/edit', name: 'Modifier profil', component: EditAccount },
+    { path: '/account/create', name: 'CreerCompte', component: CreateAccount },
+    { path: '/account/edit', name: 'ModifierProfil', component: EditAccount },
     { path: '/match/create/:id', name: 'CreateMatch', component: CreateMatch },
     { path: '/match/mesmatchs/', name: 'MesMatchs', component: MyMatchs },
-    { path: '/match/passes/', name: 'Passes', component: MatchsPasses },
-    //{ path: '/match/edit/:id', name: 'EditMatch', component: EditMatch },
+    //{ path: '/match/passes/', name: 'Passes', component: MatchsPasses },
+    { path: '/match/info/:id', name: 'InfoMatch', component: MatchsInfos },
     // ici les autre routes
   ]
 })
