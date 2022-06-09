@@ -9,11 +9,11 @@ module.exports = {
         // Ici vos couleurs exportées de Figma
       },
       "fontFamily": {
-        // Ici vos familles de polices exportées de Figma
-        // Ne pas oublier de les charger dans '/index.html' !
       },
     },
 
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 }

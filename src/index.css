@@ -2,4 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+
 /* Mettre ici les styles "globaux" */
+@layer base {
+    html {
+      font-family: 'Montserrat', system-ui, sans-serif;
+    }
+  }
